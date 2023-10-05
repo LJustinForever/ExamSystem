@@ -11,7 +11,7 @@ namespace ExamSystem.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class AnswersController : ControllerBase
+    public class AnswersController : Controller
     {
         private readonly AppDbContext _dbContext;
 
@@ -48,7 +48,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAnswer(Guid id, Answer answerEdit)
+        public async Task<IActionResult> PutAnswer(Guid id, [FromForm] Answer answerEdit)
         {
             if (id != answerEdit.Id)
             {

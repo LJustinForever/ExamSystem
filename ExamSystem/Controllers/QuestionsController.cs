@@ -89,10 +89,6 @@ namespace ExamSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteQuestion(Guid id)
         {
-            if (_dbContext.Question == null)
-            {
-                return NotFound();
-            }
             var question = await _dbContext.Question.FindAsync(id);
             if (question == null)
             {
