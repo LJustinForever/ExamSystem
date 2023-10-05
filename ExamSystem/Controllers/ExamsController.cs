@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ExamSystem.Controllers
 {
@@ -21,15 +22,17 @@ namespace ExamSystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var data = _dbContext.Exam.ToList();
-
-            return Json(data);
+            if (_dbContext.Exam == null)
+            {
+                return NotFound();
+            }
+            return  Json(await _dbContext.Exam.ToListAsync());
         }
 
-        [HttpGet("ExamGet")]
-        public async Task<IActionResult> ExamGet(Guid? id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetExam(Guid? id)
         {
             if (id == null || _dbContext.Exam == null)
             {
@@ -53,6 +56,7 @@ namespace ExamSystem.Controllers
             {
                 exam.Id = Guid.NewGuid();
                 exam.Number = _dbContext.Exam.Count() + 1;
+                exam.Status = Enums.ExamStatusEnum.INACTIVE;
                 _dbContext.Add(exam);
                 await _dbContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -77,7 +81,7 @@ namespace ExamSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPatch("Edit")]
+        [HttpPut("Edit")]
         public async Task<IActionResult> Edit(Guid? id, [FromForm] Exam examEdit)
         {
             var exam = await _dbContext.Exam.FindAsync(id);
@@ -88,8 +92,38 @@ namespace ExamSystem.Controllers
             }
 
             exam.Name = examEdit.Name;
-            exam.Status = examEdit.Status;
             exam.Questions= examEdit.Questions;
+
+            await _dbContext.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPut("Publish/{id}")]
+        public async Task<IActionResult> Publish(Guid? id)
+        {
+            var exam = await _dbContext.Exam.FirstAsync(e => e.Id == id);
+
+            if (exam == null)
+            {
+                return Problem("Exam not found");
+            }
+            if(exam.Questions.Count == 0) 
+            {
+                return Problem("No Questions");
+            }
+            foreach (Question question in exam.Questions)
+            {
+                bool containsCorrect = false;
+                foreach (Answer answer in question.Answers)
+                {
+                    if(answer.IsCorrect)
+                        containsCorrect = true;
+                }
+                if (!containsCorrect)
+                    return Problem("Question does not contain a single correct answer");
+            }
+
+            exam.Status = Enums.ExamStatusEnum.ACTIVE;
 
             await _dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

@@ -10,5 +10,8 @@ namespace ExamSystem.Model
         [Required]
         public string Description { get; set; }
 
+        [Required]
+        public bool IsCorrect { get; set; }
+
     }
 }

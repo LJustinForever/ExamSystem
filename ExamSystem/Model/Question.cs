@@ -11,6 +11,7 @@ namespace ExamSystem.Model
         [Required]
         public string Description { get; set; }
 
-        public List<Answer> Answers { get; set; }
+        public List<Answer>? Answers { get; set; }
+
     }
 }
