@@ -9,35 +9,40 @@ using ExamSystem.Model;
 
 namespace ExamSystem.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/Exams/{examId}/Questions/{questionId}/[controller]")]
     [ApiController]
     public class AnswersController : Controller
     {
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _context;
 
         public AnswersController(AppDbContext context)
         {
-            _dbContext = context;
+            _context = context;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswer()
+        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswer(Guid examId, Guid questionId)
         {
-          if (_dbContext.Answer == null)
+            if(!ExamExists(examId))
+                return NotFound();
+            if (!QuestionExists(questionId))
+                return NotFound();
+            if (_context.Answer == null)
           {
               return NotFound();
           }
-            return await _dbContext.Answer.ToListAsync();
+            return await _context.Answer.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Answer>> GetAnswer(Guid id)
+        public async Task<ActionResult<Answer>> GetAnswer(Guid examId, Guid questionId, Guid id)
         {
-          if (_dbContext.Answer == null)
-          {
-              return NotFound();
-          }
-            var answer = await _dbContext.Answer.FindAsync(id);
+            if (!ExamExists(examId))
+                return NotFound();
+            if (!QuestionExists(questionId))
+                return NotFound();
+         
+            var answer = await _context.Answer.FindAsync(id);
 
             if (answer == null)
             {
@@ -48,14 +53,18 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAnswer(Guid id, [FromForm] Answer answerEdit)
+        public async Task<IActionResult> PutAnswer(Guid examId, Guid questionId, Guid id, Answer answerEdit)
         {
+            if (!ExamExists(examId))
+                return NotFound();
+            if (!QuestionExists(questionId))
+                return NotFound();
             if (id != answerEdit.Id)
             {
                 return BadRequest();
             }
 
-            Answer? answer = await _dbContext.Answer.FindAsync(id);
+            Answer? answer = await _context.Answer.FindAsync(id);
             if(answer == null) 
                 return Problem("Answer not found");
 
@@ -65,7 +74,7 @@ namespace ExamSystem.Controllers
 
             try
             {
-                await _dbContext.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -83,32 +92,50 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Answer>> PostAnswer(Answer answer)
+        public async Task<ActionResult<Answer>> PostAnswer(Guid examId, Guid questionId, Answer answer)
         {
-            _dbContext.Answer.Add(answer);
-            await _dbContext.SaveChangesAsync();
+            if (!ExamExists(examId))
+                return NotFound();
+            if (!QuestionExists(questionId))
+                return NotFound();
+
+            answer.QuestionId = questionId;
+            _context.Answer.Add(answer);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAnswer", new { id = answer.Id }, answer);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAnswer(Guid id)
+        public async Task<IActionResult> DeleteAnswer(Guid examId, Guid questionId, Guid id)
         {
-            var answer = await _dbContext.Answer.FindAsync(id);
+            if (!ExamExists(examId))
+                return NotFound();
+            if (!QuestionExists(questionId))
+                return NotFound();
+            var answer = await _context.Answer.FindAsync(id);
             if (answer == null)
             {
                 return NotFound();
             }
 
-            _dbContext.Answer.Remove(answer);
-            await _dbContext.SaveChangesAsync();
+            _context.Answer.Remove(answer);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool AnswerExists(Guid id)
         {
-            return (_dbContext.Answer?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Answer?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+        private bool QuestionExists(Guid id)
+        {
+            return (_context.Question?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+        private bool ExamExists(Guid id)
+        {
+            return (_context.Exam?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

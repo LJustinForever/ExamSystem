@@ -14,6 +14,6 @@ namespace ExamSystem.Model
         [Required]
         public ExamStatusEnum Status { get; set; }
 
-        public List<Question>? Questions { get; set; }
+        public ICollection<Question> Questions { get; set; } = new List<Question>();
     }
 }

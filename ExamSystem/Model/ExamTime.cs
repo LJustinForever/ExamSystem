@@ -16,11 +16,11 @@ namespace ExamSystem.Model
         public ExamTimeStatusEnum Status { get; set; }
 
         [ForeignKey(nameof(ExamId))]
-        public Exam Exam { get; set; }
+        public Exam? Exam { get; set; }
         public Guid ExamId { get; set; }
 
         [ForeignKey(nameof(ExamLocationId))]
-        public ExamLocation ExamLocation { get; set; }
+        public ExamLocation? ExamLocation { get; set; }
         public Guid ExamLocationId { get; set; }
     }
 }

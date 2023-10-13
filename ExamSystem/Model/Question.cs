@@ -11,7 +11,11 @@ namespace ExamSystem.Model
         [Required]
         public string Description { get; set; }
 
-        public List<Answer>? Answers { get; set; }
+        [ForeignKey(nameof(ExamId))]
+        public Exam? Exam { get; set; }
+        public Guid ExamId { get; set; }
+
+        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
     }
 }

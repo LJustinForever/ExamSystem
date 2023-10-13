@@ -2,131 +2,120 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ExamSystem.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
-    public class ExamsController : Controller
+    public class ExamsController : ControllerBase
     {
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _context;
 
         public ExamsController(AppDbContext context)
         {
-            _dbContext = context;
+            _context = context;
         }
 
+        // GET: api/Exams
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult<IEnumerable<Exam>>> GetExam()
         {
-            if (_dbContext.Exam == null)
-            {
-                return NotFound();
-            }
-            return  Json(await _dbContext.Exam.ToListAsync());
+          if (_context.Exam == null)
+          {
+              return NotFound();
+          }
+            return await _context.Exam.Include(e => e.Questions).ToListAsync();
         }
 
+        // GET: api/Exams/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetExam(Guid? id)
+        public async Task<ActionResult<Exam>> GetExam(Guid id)
         {
-            if (id == null || _dbContext.Exam == null)
-            {
-                return NotFound();
-            }
+            var exam = await _context.Exam.Include(e => e.Questions).ThenInclude(e => e.Answers).FirstOrDefaultAsync(e => e.Id == id);
 
-            var exam = await _dbContext.Exam
-                .FirstOrDefaultAsync(m => m.Id == id);
             if (exam == null)
             {
                 return NotFound();
             }
 
-            return Json(exam);
+            return exam;
         }
 
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromForm] Exam exam)
+        // PUT: api/Exams/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutExam(Guid id, Exam exam)
         {
-            if (ModelState.IsValid)
+            var oldExam = await _context.Exam.FindAsync(id);
+            if (oldExam == null)
+                return NotFound();
+            using (var context = _context.Database.BeginTransaction()) 
             {
-                exam.Id = Guid.NewGuid();
-                exam.Number = _dbContext.Exam.Count() + 1;
-                exam.Status = Enums.ExamStatusEnum.INACTIVE;
-                _dbContext.Add(exam);
-                await _dbContext.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                oldExam.Name = exam.Name;
+                oldExam.Number = exam.Number;
+                oldExam.Status = exam.Status;
+                _context.SaveChanges();
+                context.Commit();
             }
-            return View(exam);
-        }
-
-        [HttpDelete("Delete")]
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (_dbContext.Exam == null)
+            try
             {
-                return Problem("Entity set 'AppDbContext.Exam'  is null.");
+                await _context.SaveChangesAsync();
             }
-            var exam = await _dbContext.Exam.FindAsync(id);
-            if (exam != null)
+            catch (DbUpdateConcurrencyException)
             {
-                _dbContext.Exam.Remove(exam);
-            }
-
-            await _dbContext.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPut("Edit")]
-        public async Task<IActionResult> Edit(Guid? id, [FromForm] Exam examEdit)
-        {
-            var exam = await _dbContext.Exam.FindAsync(id);
-
-            if (exam == null)
-            {
-                return Problem("Exam not found");
-            }
-
-            exam.Name = examEdit.Name;
-            exam.Questions= examEdit.Questions;
-
-            await _dbContext.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPut("Publish/{id}")]
-        public async Task<IActionResult> Publish(Guid? id)
-        {
-            var exam = await _dbContext.Exam.FirstAsync(e => e.Id == id);
-
-            if (exam == null)
-            {
-                return Problem("Exam not found");
-            }
-            if(exam.Questions.Count == 0) 
-            {
-                return Problem("No Questions");
-            }
-            foreach (Question question in exam.Questions)
-            {
-                bool containsCorrect = false;
-                foreach (Answer answer in question.Answers)
+                if (!ExamExists(id))
                 {
-                    if(answer.IsCorrect)
-                        containsCorrect = true;
+                    return NotFound();
                 }
-                if (!containsCorrect)
-                    return Problem("Question does not contain a single correct answer");
+                else
+                {
+                    throw;
+                }
             }
 
-            exam.Status = Enums.ExamStatusEnum.ACTIVE;
+            return NoContent();
+        }
 
-            await _dbContext.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+        // POST: api/Exams
+        [HttpPost]
+        public async Task<ActionResult<Exam>> PostExam(Exam exam)
+        {
+          if (_context.Exam == null)
+          {
+              return Problem("Entity set 'AppDbContext.Exam'  is null.");
+          }
+            _context.Exam.Add(exam);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetExam", new { id = exam.Id }, exam);
+        }
+
+        // DELETE: api/Exams/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteExam(Guid id)
+        {
+            if (_context.Exam == null)
+            {
+                return NotFound();
+            }
+            var exam = await _context.Exam.FindAsync(id);
+            if (exam == null)
+            {
+                return NotFound();
+            }
+
+            _context.Exam.Remove(exam);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool ExamExists(Guid id)
+        {
+            return (_context.Exam?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

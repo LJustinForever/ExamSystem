@@ -10,36 +10,36 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ExamSystem.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ExamLocationsController : Controller
     {
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _context;
 
         public ExamLocationsController(AppDbContext context)
         {
-            _dbContext = context;
+            _context = context;
         }
 
         // GET: api/ExamLocations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExamLocation>>> GetExamLocation()
         {
-          if (_dbContext.ExamLocation == null)
+          if (_context.ExamLocation == null)
           {
               return NotFound();
           }
-            return await _dbContext.ExamLocation.ToListAsync();
+            return await _context.ExamLocation.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ExamLocation>> GetExamLocation(Guid id)
         {
-          if (_dbContext.ExamLocation == null)
+          if (_context.ExamLocation == null)
           {
               return NotFound();
           }
-            var examLocation = await _dbContext.ExamLocation.FindAsync(id);
+            var examLocation = await _context.ExamLocation.FindAsync(id);
 
             if (examLocation == null)
             {
@@ -52,19 +52,15 @@ namespace ExamSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> EditExamLocation(Guid id, [FromForm] ExamLocation examLocationEdit)
         {
-            if (id != examLocationEdit.Id)
-            {
-                return BadRequest();
-            }
-
-            ExamLocation? examLocation = await _dbContext.ExamLocation.FindAsync(id);
+            ExamLocation? examLocation = await _context.ExamLocation.FindAsync(id);
             if (examLocation == null)
                 return Problem("Exam Location not found");
 
             examLocation.Name = examLocationEdit.Name;
+            examLocation.Status = examLocationEdit.Status;
             try
             {
-                await _dbContext.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,8 +80,8 @@ namespace ExamSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<ExamLocation>> PostExamLocation(ExamLocation examLocation)
         {
-            _dbContext.ExamLocation.Add(examLocation);
-            await _dbContext.SaveChangesAsync();
+            _context.ExamLocation.Add(examLocation);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetExamLocation", new { id = examLocation.Id }, examLocation);
         }
@@ -93,21 +89,21 @@ namespace ExamSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExamLocation(Guid id)
         {
-            var examLocation = await _dbContext.ExamLocation.FindAsync(id);
+            var examLocation = await _context.ExamLocation.FindAsync(id);
             if (examLocation == null)
             {
                 return NotFound();
             }
 
-            _dbContext.ExamLocation.Remove(examLocation);
-            await _dbContext.SaveChangesAsync();
+            _context.ExamLocation.Remove(examLocation);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool ExamLocationExists(Guid id)
         {
-            return (_dbContext.ExamLocation?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.ExamLocation?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ExamSystem.Model
 {
@@ -12,6 +13,10 @@ namespace ExamSystem.Model
 
         [Required]
         public bool IsCorrect { get; set; }
+
+        [ForeignKey(nameof(QuestionId))]
+        public Question? Question { get; set; }
+        public Guid QuestionId { get; set; }
 
     }
 }
