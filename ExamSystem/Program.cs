@@ -37,7 +37,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseSqlServer("Server=tcp:examsystemserver.database.windows.net,1433;Initial Catalog=ExamSystem;Persist Security Info=False;User ID=examAdmin;Password=ASDasd123.;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
 
@@ -96,6 +96,8 @@ app.UseSwaggerUI(options =>
 });
 app.MapControllers();
 app.AddAuthApi();
+
+app.UseCors();
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -9,6 +9,7 @@ namespace ExamSystem.Model
         public string Title { get; set; }
 
         [Required]
+        [Column(TypeName = "varchar(5000)")]
         public string Description { get; set; }
 
         [Required]
