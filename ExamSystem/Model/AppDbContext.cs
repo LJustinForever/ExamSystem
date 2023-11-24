@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExamSystem.Model
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser, UserRole, Guid>
+    public partial class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public DbSet<Answer> Answer { get; set; }
         public DbSet<Question> Question { get; set; }

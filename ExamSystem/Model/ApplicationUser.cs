@@ -7,12 +7,14 @@ namespace ExamSystem.Model
     public class ApplicationUser : IdentityUser<Guid>
     {
         [Required, MaxLength(40)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required, MaxLength(40)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [Required]
-        public ApplicationUserStatusEnum Status { get; set; }
+        public ApplicationUserStatusEnum Status { get; set; } = ApplicationUserStatusEnum.ACTIVE;
+
+        public bool ForceRelogin { get; set; }
     }
 }

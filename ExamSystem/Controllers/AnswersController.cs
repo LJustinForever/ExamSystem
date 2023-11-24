@@ -6,21 +6,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExamSystem.Controllers
 {
     [Route("api/Exams/{examId}/Questions/{questionId}/[controller]")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     public class AnswersController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AnswersController(AppDbContext context)
+        public AnswersController(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpGet]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<IEnumerable<Answer>>> GetAnswer(Guid examId, Guid questionId)
         {
             if(!ExamExists(examId))
@@ -35,6 +41,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Answer>> GetAnswer(Guid examId, Guid questionId, Guid id)
         {
             if (!ExamExists(examId))
@@ -53,6 +60,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> PutAnswer(Guid examId, Guid questionId, Guid id, Answer answerEdit)
         {
             if (!ExamExists(examId))
@@ -92,14 +100,20 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Answer>> PostAnswer(Guid examId, Guid questionId, Answer answer)
         {
+            ApplicationUser? user = _context.Users.FirstOrDefault(e => e.Id == Guid.Parse(_userManager.GetUserId(HttpContext.User)));
+            if (user == null)
+                return NotFound();
+
             if (!ExamExists(examId))
                 return NotFound();
             if (!QuestionExists(questionId))
                 return NotFound();
 
             answer.QuestionId = questionId;
+            answer.UserId = user.Id;
             _context.Answer.Add(answer);
             await _context.SaveChangesAsync();
 
@@ -107,7 +121,9 @@ namespace ExamSystem.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAnswer(Guid examId, Guid questionId, Guid id)
+        [Authorize(Roles = UserRoles.ADMIN)]
+        public async Task<IActionResult> DeleteAnswer(Guid examId, Guid questionId, Guid id)        
+
         {
             if (!ExamExists(examId))
                 return NotFound();

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExamSystem.Controllers
 {
@@ -22,6 +23,7 @@ namespace ExamSystem.Controllers
 
         // GET: api/Exams
         [HttpGet]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<IEnumerable<Exam>>> GetExam()
         {
           if (_context.Exam == null)
@@ -33,6 +35,7 @@ namespace ExamSystem.Controllers
 
         // GET: api/Exams/5
         [HttpGet("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<Exam>> GetExam(Guid id)
         {
             var exam = await _context.Exam.Include(e => e.Questions).ThenInclude(e => e.Answers).FirstOrDefaultAsync(e => e.Id == id);
@@ -47,6 +50,7 @@ namespace ExamSystem.Controllers
 
         // PUT: api/Exams/5
         [HttpPut("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> PutExam(Guid id, Exam exam)
         {
             var oldExam = await _context.Exam.FindAsync(id);
@@ -81,6 +85,7 @@ namespace ExamSystem.Controllers
 
         // POST: api/Exams
         [HttpPost]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Exam>> PostExam(Exam exam)
         {
           if (_context.Exam == null)
@@ -95,6 +100,7 @@ namespace ExamSystem.Controllers
 
         // DELETE: api/Exams/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteExam(Guid id)
         {
             if (_context.Exam == null)

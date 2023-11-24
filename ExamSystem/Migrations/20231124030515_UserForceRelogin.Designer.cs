@@ -3,6 +3,7 @@ using System;
 using ExamSystem.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231124030515_UserForceRelogin")]
+    partial class UserForceRelogin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +51,7 @@ namespace ExamSystem.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Answer", (string)null);
+                    b.ToTable("Answer");
                 });
 
             modelBuilder.Entity("ExamSystem.Model.ApplicationUser", b =>
@@ -150,7 +153,7 @@ namespace ExamSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Exam", (string)null);
+                    b.ToTable("Exam");
                 });
 
             modelBuilder.Entity("ExamSystem.Model.ExamLocation", b =>
@@ -168,7 +171,7 @@ namespace ExamSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ExamLocation", (string)null);
+                    b.ToTable("ExamLocation");
                 });
 
             modelBuilder.Entity("ExamSystem.Model.ExamTime", b =>
@@ -198,7 +201,7 @@ namespace ExamSystem.Migrations
 
                     b.HasIndex("ExamLocationId");
 
-                    b.ToTable("ExamTime", (string)null);
+                    b.ToTable("ExamTime");
                 });
 
             modelBuilder.Entity("ExamSystem.Model.Question", b =>
@@ -226,7 +229,7 @@ namespace ExamSystem.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Question", (string)null);
+                    b.ToTable("Question");
                 });
 
             modelBuilder.Entity("ExamSystem.Model.Submition", b =>
@@ -247,7 +250,7 @@ namespace ExamSystem.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Submition", (string)null);
+                    b.ToTable("Submition");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>

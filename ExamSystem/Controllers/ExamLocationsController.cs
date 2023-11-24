@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExamSystem.Controllers
 {
@@ -23,6 +24,7 @@ namespace ExamSystem.Controllers
 
         // GET: api/ExamLocations
         [HttpGet]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<IEnumerable<ExamLocation>>> GetExamLocation()
         {
           if (_context.ExamLocation == null)
@@ -33,6 +35,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<ExamLocation>> GetExamLocation(Guid id)
         {
           if (_context.ExamLocation == null)
@@ -50,6 +53,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> EditExamLocation(Guid id, [FromForm] ExamLocation examLocationEdit)
         {
             ExamLocation? examLocation = await _context.ExamLocation.FindAsync(id);
@@ -78,6 +82,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<ExamLocation>> PostExamLocation(ExamLocation examLocation)
         {
             _context.ExamLocation.Add(examLocation);
@@ -87,6 +92,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteExamLocation(Guid id)
         {
             var examLocation = await _context.ExamLocation.FindAsync(id);

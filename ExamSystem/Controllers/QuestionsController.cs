@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExamSystem.Controllers
 {
@@ -22,6 +23,7 @@ namespace ExamSystem.Controllers
 
         // GET: api/Questions
         [HttpGet]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<IEnumerable<Question>>> GetQuestion(Guid examId)
         {
             if (!ExamExists(examId))
@@ -34,6 +36,7 @@ namespace ExamSystem.Controllers
 
         // GET: api/Questions/5
         [HttpGet("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<Question>> GetQuestion(Guid examId, Guid id)
         {
             if (!ExamExists(examId))
@@ -53,6 +56,7 @@ namespace ExamSystem.Controllers
         // PUT: api/Questions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> PutQuestion(Guid examId, Guid id, Question question)
         {
             if (!ExamExists(examId))
@@ -86,6 +90,7 @@ namespace ExamSystem.Controllers
         // POST: api/Questions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Question>> PostQuestion(Guid examId, Question question)
         {
             if (!ExamExists(examId))
@@ -104,6 +109,7 @@ namespace ExamSystem.Controllers
 
         // DELETE: api/Questions/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteQuestion(Guid examId, Guid id)
         {
             if (!ExamExists(examId))

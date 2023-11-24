@@ -18,5 +18,9 @@ namespace ExamSystem.Model
         public Question? Question { get; set; }
         public Guid QuestionId { get; set; }
 
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser? User { get; set; }
+        public Guid? UserId { get; set; }
+
     }
 }
