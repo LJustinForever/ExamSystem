@@ -19,6 +19,14 @@ KAUNAS 2023
     - [Sistemos paskirtis](#sistemos-paskirtis)
     - [Funkciniai reikalavimai](#funkciniai-reikalavimai)
     - [Sistemos architektūra](#sistemos-architektūra)
+- [API specifikacija](#api-specifikacija)
+  - [Answers](#answers)
+  - [Exam Locations](#exam-locations)
+  - [Exams](#exams)
+  - [Users](#users)
+  - [ExamTime](#examtime)
+- [Naudotojo sąsajos projektas](#naudotojo-sąsajos-projektas)
+- [Išvados](#išvados)
 
 ### Sprendžiamo uždavinio aprašymas
 
@@ -89,7 +97,7 @@ Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra 
 
 # API specifikacija
 
-##Answers
+## Answers
 
 ### /api/Exams/{examId}/Questions/{questionId}/Answers
 
@@ -432,7 +440,7 @@ Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra 
 | ---- | ----------- |
 | 200 | Success |
 
-##Exam Locations
+## Exam Locations
 
 ### /api/ExamLocations
 
@@ -530,7 +538,7 @@ Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra 
 | ---- | ----------- |
 | 200 | Success |
 
-##Exams
+## Exams
 
 ### /api/Exams
 
@@ -823,7 +831,7 @@ Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra 
 | ---- | ----------- |
 | 200 | Success |
 
-##Users
+## Users
 
 ### /api/Register
 
@@ -878,7 +886,7 @@ Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra 
 | ---- | ----------- |
 | 200 | Success |
 
-##ExamTime
+## ExamTime
 
 ### /api/ExamTimes
 
@@ -1379,7 +1387,7 @@ Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra 
 | ---- | ----------- |
 | 200 | Success |
 
-##Naudotojo sąsajos projektas
+## Naudotojo sąsajos projektas
 
 ![Alt text](image.png)
 Pagrindinis langas (svečio atžvilgiu)
@@ -1465,7 +1473,7 @@ Egzaminų sąrašas (naudotojo atžvilgiu)
 ![Alt text](image-27.png)
 Egzamino laikų sąrašas (naudotojo atžvilgiu)
 
-##Išvados
+## Išvados
 
 Šiame projekte buvo realizuota egzaminavimo sistema. Skirta kurti, egzaminus. Sistema realizuota REST principais su JWT authentifikacija.
 
