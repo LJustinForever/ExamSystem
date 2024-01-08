@@ -24,18 +24,16 @@ namespace ExamSystem.Controllers
 
         // GET: api/ExamLocations
         [HttpGet]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
-        public async Task<ActionResult<IEnumerable<ExamLocation>>> GetExamLocation()
+        public async Task<ActionResult<IEnumerable<ExamLocation>>> GetExamLocation(int pageNumber)
         {
           if (_context.ExamLocation == null)
           {
               return NotFound();
           }
-            return await _context.ExamLocation.ToListAsync();
+            return await _context.ExamLocation.Take(10 * pageNumber).ToListAsync();
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<ExamLocation>> GetExamLocation(Guid id)
         {
           if (_context.ExamLocation == null)
@@ -53,8 +51,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
-        public async Task<IActionResult> EditExamLocation(Guid id, [FromForm] ExamLocation examLocationEdit)
+        public async Task<IActionResult> EditExamLocation(Guid id, ExamLocation examLocationEdit)
         {
             ExamLocation? examLocation = await _context.ExamLocation.FindAsync(id);
             if (examLocation == null)
@@ -78,21 +75,19 @@ namespace ExamSystem.Controllers
                 }
             }
 
-            return RedirectToAction("GetExamLocation", new { id });
+            return NoContent();
         }
 
         [HttpPost]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<ExamLocation>> PostExamLocation(ExamLocation examLocation)
         {
             _context.ExamLocation.Add(examLocation);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetExamLocation", new { id = examLocation.Id }, examLocation);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteExamLocation(Guid id)
         {
             var examLocation = await _context.ExamLocation.FindAsync(id);

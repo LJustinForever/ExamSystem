@@ -26,8 +26,7 @@ namespace ExamSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
-        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswer(Guid examId, Guid questionId)
+        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswer(Guid examId, Guid questionId, int pageNumber)
         {
             if(!ExamExists(examId))
                 return NotFound();
@@ -37,11 +36,10 @@ namespace ExamSystem.Controllers
           {
               return NotFound();
           }
-            return await _context.Answer.ToListAsync();
+            return await _context.Answer.Where(e => e.QuestionId == questionId).Take(10 * pageNumber).ToListAsync();
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Answer>> GetAnswer(Guid examId, Guid questionId, Guid id)
         {
             if (!ExamExists(examId))
@@ -60,7 +58,6 @@ namespace ExamSystem.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> PutAnswer(Guid examId, Guid questionId, Guid id, Answer answerEdit)
         {
             if (!ExamExists(examId))
@@ -96,14 +93,14 @@ namespace ExamSystem.Controllers
                 }
             }
 
-            return RedirectToAction("GetAnswer", new { id });
+            return NoContent();
         }
 
         [HttpPost]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Answer>> PostAnswer(Guid examId, Guid questionId, Answer answer)
         {
-            ApplicationUser? user = _context.Users.FirstOrDefault(e => e.Id == Guid.Parse(_userManager.GetUserId(HttpContext.User)));
+            Guid id = Guid.Parse(User.FindFirst("sub")?.Value);
+            var user = _context.Users.FirstOrDefault(e => e.Id == id);
             if (user == null)
                 return NotFound();
 
@@ -121,7 +118,6 @@ namespace ExamSystem.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteAnswer(Guid examId, Guid questionId, Guid id)        
 
         {

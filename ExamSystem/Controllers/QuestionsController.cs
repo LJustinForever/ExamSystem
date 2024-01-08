@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace ExamSystem.Controllers
 {
@@ -15,35 +16,37 @@ namespace ExamSystem.Controllers
     public class QuestionsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser>  _userManager;
+        private readonly SignInManager<ApplicationUser>  _signInManager;
 
-        public QuestionsController(AppDbContext context)
+        public QuestionsController(AppDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: api/Questions
         [HttpGet]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetQuestion(Guid examId)
+        public async Task<ActionResult<IEnumerable<Question>>> GetQuestion(Guid examId, int pageNumber)
         {
             if (!ExamExists(examId))
                 return NotFound();
             if (_context.Question == null)
                 return NotFound();
 
-            return await _context.Question.Include(e => e.Answers).ToListAsync();
+            return await _context.Question.Include(e => e.Answers).Where(e => e.ExamId == examId).Take(10 * pageNumber).ToListAsync();
         }
 
         // GET: api/Questions/5
         [HttpGet("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<Question>> GetQuestion(Guid examId, Guid id)
         {
             if (!ExamExists(examId))
                 return NotFound();
             if (_context.Question == null)
               return NotFound();
-            var question = _context.Question.Include(e => e.Answers).FirstOrDefault(e => e.Id == id);
+            var question = _context.Question.Include(e => e.Answers).Where(e => e.ExamId == examId).FirstOrDefault(e => e.Id == id);
 
             if (question == null)
             {
@@ -56,7 +59,6 @@ namespace ExamSystem.Controllers
         // PUT: api/Questions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> PutQuestion(Guid examId, Guid id, Question question)
         {
             if (!ExamExists(examId))
@@ -90,9 +92,10 @@ namespace ExamSystem.Controllers
         // POST: api/Questions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<Question>> PostQuestion(Guid examId, Question question)
         {
+            Guid id = Guid.Parse(User.FindFirst("sub")?.Value);
+            var user = _context.Users.FirstOrDefault(e => e.Id == id);
             if (!ExamExists(examId))
                 return NotFound();
             if (_context.Question == null)
@@ -101,6 +104,7 @@ namespace ExamSystem.Controllers
             }
 
             question.ExamId = examId;
+            question.UserId = user.Id;
             _context.Question.Add(question);
             await _context.SaveChangesAsync();
 
@@ -109,7 +113,6 @@ namespace ExamSystem.Controllers
 
         // DELETE: api/Questions/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteQuestion(Guid examId, Guid id)
         {
             if (!ExamExists(examId))

@@ -18,7 +18,7 @@ namespace ExamSystem.Model
         public ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
         [ForeignKey(nameof(UserId))]
-        public ApplicationUser User { get; set; }
+        public ApplicationUser? User { get; set; }
         public Guid UserId { get; set; }
     }
 }

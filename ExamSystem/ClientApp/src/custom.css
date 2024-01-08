@@ -1,4 +1,7 @@
 /* Provide sufficient contrast against white background */
+* {
+  font-family: 'Roboto', sans-serif;
+}
 a {
   color: #0366d6;
 }
@@ -15,4 +18,202 @@ code {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
+}
+
+/* Styles for the section containing the login form */
+/* section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; 
+} */
+
+/* Styles for the login form container */
+.login-div {
+  background-color: #f7f7f7;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 300px;
+}
+
+/* Styles for form elements */
+.login-div h1 {
+  margin-bottom: 20px;
+}
+
+/* form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+} */
+
+label {
+  margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Styles for the "Need an Account?" section */
+p {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.line {
+  border-bottom: 1px solid #ccc;
+  line-height: 0.1em;
+  margin: 10px 0 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.line span {
+  background-color: #f7f7f7;
+  padding: 0 10px;
+}
+
+.line span a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.line span a:hover {
+  color: #0056b3;
+}
+
+/* Styles for the modal */
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Adjust this style for the modal content */
+.modal p {
+  padding-right: 2rem;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for success section */
+.success-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+/* Styles for registration section */
+.register-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Styles for error message */
+.errmsg {
+  color: red;
+  margin-bottom: 10px;
+}
+
+/* Styles for offscreen elements */
+.offscreen {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Styles for form */
+.register-form {
+  background-color: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 300px;
+  margin-top: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* Styles for form inputs */
+.register-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Styles for valid and invalid icons */
+.valid,
+.invalid {
+  margin-left: 5px;
+  color: green; /* Change to desired color */
+}
+
+.invalid {
+  color: red; /* Change to desired color */
+}
+
+.hide {
+  display: none;
+}
+
+/* Styles for line separator */
+.line {
+  border-bottom: 1px solid #ccc;
+  line-height: 0.1em;
+  margin: 10px 0 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.line span {
+  background-color: #f7f7f7;
+  padding: 0 10px;
+}
+
+/* Styles for sign up link */
+.signup-link {
+  text-decoration: none;
+  color: #007bff; /* Change to desired color */
+}
+
+.signup-link:hover {
+  color: #0056b3; /* Change to desired color */
+}
+
+.image{
+  max-width: 50vw;
 }

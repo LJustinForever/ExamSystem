@@ -37,13 +37,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer("Server=tcp:examsystemserver.database.windows.net,1433;Initial Catalog=ExamSystem;Persist Security Info=False;User ID=examAdmin;Password=ASDasd123.;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+    options.UseSqlServer("Server=DESKTOP-AOH7V3O\\SQLEXPRESS;Database=examsystem;Trusted_Connection=true;TrustServerCertificate=true"));
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
+builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
-
-
-builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -73,7 +72,10 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 //DEBUG
-builder.Services.AddCors(options => options.AddPolicy("MyPolicy", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+builder.Services.AddCors(options => options.AddPolicy("MyPolicy", builder => builder.WithOrigins("http://localhost:44489")
+                                                                                                        .AllowAnyHeader()
+                                                                                                        .AllowAnyMethod()
+                                                                                                        .AllowCredentials()));
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -94,12 +96,12 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = "swag";
 
 });
+
 app.MapControllers();
 app.AddAuthApi();
 
-app.UseCors();
+app.UseCors("MyPolicy");
 
-//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -117,5 +119,16 @@ app.MapFallbackToFile("index.html");
 //using var scope = app.Services.CreateScope();
 //var dbSeeder = scope.ServiceProvider.GetRequiredService<AuthDbSeeder>();
 //await dbSeeder.SeedAsync();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+    foreach (var VARIABLE in UserRoles.ALL.ToArray())
+    {
+        if (!await roleManager.RoleExistsAsync(VARIABLE))
+            await roleManager.CreateAsync(new IdentityRole<Guid>(VARIABLE));
+    }
+}
 
 app.Run();

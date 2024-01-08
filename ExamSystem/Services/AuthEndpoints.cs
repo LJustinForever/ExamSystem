@@ -21,8 +21,8 @@ public static class AuthEndpoints
             {
                 Email = registerUserDto.Email,
                 UserName = registerUserDto.Username,
-                Name = "",
-                LastName = "",
+                Name = registerUserDto.Name,
+                LastName = registerUserDto.LastName,
 
             };
             var createUser = await userManager.CreateAsync(newUser, registerUserDto.Password);
@@ -37,7 +37,7 @@ public static class AuthEndpoints
             return Results.Created("api/Login", new UserDto(newUser.Id, newUser.UserName, newUser.Email));
         });
 
-        app.MapPost("api/Login", async (UserManager<ApplicationUser> userManager, JwtTokenService jwtTokenService, LoginUserDto loginUserDto) =>
+        app.MapPost("api/Login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, JwtTokenService jwtTokenService, LoginUserDto loginUserDto) =>
         {
             var user = await userManager.FindByNameAsync(loginUserDto.Username);
             if (user == null)
@@ -53,6 +53,7 @@ public static class AuthEndpoints
             }
             user.ForceRelogin = false;
             await userManager.UpdateAsync(user);
+            await signInManager.SignInAsync(user, isPersistent: true);
             var roles = await userManager.GetRolesAsync(user);
             var accessToken = jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
             var refreshToken = jwtTokenService.CreateRefreshToken(user.Id);

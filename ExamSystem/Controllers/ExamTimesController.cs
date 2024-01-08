@@ -23,19 +23,17 @@ namespace ExamSystem.Controllers
 
         // GET: api/ExamTimes
         [HttpGet]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
-        public async Task<ActionResult<IEnumerable<ExamTime>>> GetExamTime()
+        public async Task<ActionResult<IEnumerable<ExamTime>>> GetExamTime(int pageNumber)
         {
           if (_context.ExamTime == null)
           {
               return NotFound();
           }
-            return await _context.ExamTime.ToListAsync();
+            return await _context.ExamTime.Include(e => e.Exam).Include(e => e.ExamLocation).Take(10 * pageNumber).ToListAsync();
         }
 
         // GET: api/ExamTimes/5
         [HttpGet("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN_AND_USER)]
         public async Task<ActionResult<ExamTime>> GetExamTime(Guid id)
         {
             if (_context.ExamTime == null)
@@ -55,7 +53,6 @@ namespace ExamSystem.Controllers
         // PUT: api/ExamTimes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> PutExamTime(Guid id, ExamTime examTime)
         {
             var oldExamTime = await _context.ExamTime.FindAsync(id);
@@ -90,22 +87,16 @@ namespace ExamSystem.Controllers
         // POST: api/ExamTimes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<ActionResult<ExamTime>> PostExamTime(ExamTime examTime)
         {
-          if (_context.ExamTime == null)
-          {
-              return Problem("Entity set 'AppDbContext.ExamTime'  is null.");
-          }
             _context.ExamTime.Add(examTime);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetExamTime", new { id = examTime.Id }, examTime);
+            return NoContent();
         }
 
         // DELETE: api/ExamTimes/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = UserRoles.ADMIN)]
         public async Task<IActionResult> DeleteExamTime(Guid id)
         {
             if (_context.ExamTime == null)
